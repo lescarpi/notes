@@ -1,0 +1,46 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Code Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+
+      - name: Compile and Test
+        run: ./gradlew build
+
+      - name: Build Image
+        run: docker build -t notes-backend:${{ github.ref_name }} .
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Amazon ECR Login
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Push Image
+        env:
+          REGISTRY: ${{ steps.login-ecr.output.registry }}
+          REPOSITORY: notes/backend
+          IMAGE_TAG: ${{ github.ref_name }}
+        run: |
+          docker tag notes-backend:$IMAGE_TAG $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
