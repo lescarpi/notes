@@ -38,7 +38,7 @@ jobs:
 
       - name: Push Image
         env:
-          REGISTRY: ${{ steps.login-ecr.output.registry }}
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: notes/backend
           IMAGE_TAG: ${{ github.ref_name }}
         run: |
