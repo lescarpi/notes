@@ -1,0 +1,6 @@
+CREATE TABLE notes
+(
+    id         UUID PRIMARY KEY,
+    content    JSONB NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);

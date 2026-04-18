@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: notes
+  datasource:
+    url: jdbc:postgresql://localhost:5432/notes_db
+    username: user
+    password: pwd
